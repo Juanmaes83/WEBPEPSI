@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PEPSI NIGHT · La fiesta universitaria</title>
+  <!-- Fuentes (las mismas, funcionan bien) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== VARIABLES (colores Pepsi) ===== */
+    :root {
+      --color-dark-blue: #0a1f44;      /* Azul oscuro Pepsi */
+      --color-blue-light: #1e3a6f;      /* Azul más claro */
+      --color-red: #e11b22;             /* Rojo Pepsi */
+      --color-red-light: #ff4d4d;        /* Rojo claro */
+      --color-white: #f5f5f5;            /* Blanco roto */
+      --color-white-dark: #d9d9d9;       /* Gris claro */
+      --font-heading: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Inter', sans-serif;
+      --space-xs: 0.5rem;
+      --space-sm: 1rem;
+      --space-md: 2rem;
+      --space-lg: 4rem;
+      --space-xl: 8rem;
+      --space-2xl: 12rem;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+      --max-width: 1400px;
+      --header-height: 80px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; overflow-x:hidden; background-color:var(--color-dark-blue); }
+    body { font-family:var(--font-body); font-weight:300; font-size:16px; line-height:1.6; color:var(--color-white); background-color:var(--color-dark-blue); overflow-x:hidden; }
+    ::selection { background-color:var(--color-red); color:var(--color-white); }
+
+    /* ===== LOADER ===== */
+    .loader {
+      position:fixed; top:0; left:0; width:100%; height:100%; background-color:var(--color-dark-blue);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999;
+      transition:opacity 0.8s var(--ease-out-expo), visibility 0.8s var(--ease-out-expo);
+    }
+    .loader.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+    .loader__logo { font-size:5rem; line-height:1; margin-bottom:var(--space-md); }
+    .loader__text { font-family:var(--font-heading); font-size:0.875rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--color-white-dark); margin-bottom:var(--space-md); }
+    .loader__progress { width:200px; height:1px; background-color:var(--color-blue-light); position:relative; overflow:hidden; }
+    .loader__progress-bar { position:absolute; top:0; left:0; height:100%; width:0%; background-color:var(--color-red); transition:width 0.3s var(--ease-out-quart); }
+    .loader__count { font-family:var(--font-body); font-size:0.75rem; color:var(--color-red); margin-top:var(--space-sm); letter-spacing:0.1em; }
+
+    /* ===== NAV ===== */
+    .nav { position:fixed; top:0; left:0; width:100%; height:var(--header-height); display:flex; align-items:center; justify-content:space-between; padding:0 var(--space-md); z-index:1000; background:rgba(10,31,68,0.95); opacity:1; transition:opacity 0.25s ease; }
+    .nav.hidden { opacity:0; pointer-events:none; }
+    .nav__logo { font-family:var(--font-heading); font-size:1.8rem; font-weight:400; color:var(--color-red); text-decoration:none; display:flex; align-items:center; gap:var(--space-xs); }
+    .nav__logo-en { font-family:var(--font-heading); font-size:0.75rem; font-weight:300; letter-spacing:0.3em; text-transform:uppercase; color:var(--color-white); }
+    .nav__links { display:flex; gap:var(--space-md); list-style:none; }
+    .nav__link { font-family:var(--font-heading); font-size:0.8rem; font-weight:400; letter-spacing:0.15em; text-transform:uppercase; color:var(--color-white); text-decoration:none; position:relative; padding:var(--space-xs) 0; transition:color 0.3s ease; }
+    .nav__link::after { content:''; position:absolute; bottom:0; left:0; width:0; height:1px; background-color:var(--color-red); transition:width 0.3s var(--ease-out-quart); }
+    .nav__link:hover { color:var(--color-red); }
+    .nav__link:hover::after { width:100%; }
+    .nav__cta { font-family:var(--font-heading); font-size:0.75rem; font-weight:400; letter-spacing:0.2em; text-transform:uppercase; color:var(--color-white); background-color:var(--color-red); padding:var(--space-xs) var(--space-sm); text-decoration:none; transition:all 0.3s var(--ease-out-quart); }
+    .nav__cta:hover { background-color:var(--color-red-light); transform:translateY(-2px); }
+    .nav__menu-btn { display:none; flex-direction:column; gap:6px; background:none; border:none; cursor:pointer; padding:var(--space-xs); }
+    .nav__menu-btn span { display:block; width:24px; height:1px; background-color:var(--color-red); transition:all 0.3s ease; }
+    @media (max-width:768px) { .nav__links, .nav__cta { display:none; } .nav__menu-btn { display:flex; } }
+
+    /* ===== HERO (canvas con 366 frames) ===== */
+    .hero { position:relative; width:100%; height:100vh; height:100dvh; background:var(--color-dark-blue); }
+    .hero__canvas-container { position:absolute; top:0; left:0; width:100%; height:100%; overflow:hidden; background:var(--color-dark-blue); }
+    .hero__canvas { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); min-width:100%; min-height:100%; object-fit:cover; }
+    .hero__overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:linear-gradient(to bottom, rgba(10,31,68,0.4) 0%, rgba(10,31,68,0.1) 30%, rgba(10,31,68,0.1) 50%, rgba(10,31,68,0.6) 75%, var(--color-dark-blue) 100%); pointer-events:none; }
+    .hero__fade { position:absolute; bottom:0; left:0; width:100%; height:30%; background:linear-gradient(to bottom, transparent 0%, rgba(10,31,68,0.5) 40%, rgba(10,31,68,0.85) 70%, var(--color-dark-blue) 100%); pointer-events:none; z-index:3; }
+    .hero__content { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; pointer-events:none; z-index:2; }
+    .hero__japanese { font-family:var(--font-heading); font-size:clamp(3rem,10vw,8rem); font-weight:300; color:var(--color-red); letter-spacing:0.3em; margin-bottom:var(--space-xs); opacity:0; transform:translateY(30px); }
+    .hero__title { font-family:var(--font-heading); font-size:clamp(1rem,3vw,1.5rem); font-weight:300; letter-spacing:0.5em; text-transform:uppercase; color:var(--color-white); margin-bottom:var(--space-md); opacity:0; transform:translateY(30px); }
+    .hero__tagline { font-family:var(--font-heading); font-size:clamp(0.875rem,2vw,1rem); font-weight:300; font-style:italic; letter-spacing:0.2em; color:var(--color-white-dark); opacity:0; transform:translateY(30px); }
+    .hero__scroll { position:absolute; bottom:var(--space-lg); left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:var(--space-sm); opacity:0; z-index:2; }
+    .hero__scroll-text { font-family:var(--font-heading); font-size:0.7rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--color-white-dark); }
+    .hero__scroll-line { width:1px; height:60px; background:linear-gradient(to bottom, var(--color-red) 0%, transparent 100%); animation:scrollPulse 2s ease-in-out infinite; }
+    @keyframes scrollPulse { 0%,100%{opacity:0.3; transform:scaleY(0.5); transform-origin:top;} 50%{opacity:1; transform:scaleY(1);} }
+
+    /* ===== FILOSOFÍA (INICIO DE LA HISTORIA) ===== */
+    .philosophy { position:relative; min-height:100vh; display:flex; align-items:center; padding:var(--space-xl) var(--space-md); background:transparent; overflow:hidden; }
+    .philosophy::before { content:''; position:absolute; inset:0; background-color:var(--color-dark-blue); z-index:0; }
+    .philosophy__container { position:relative; z-index:20; max-width:var(--max-width); margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:var(--space-xl); align-items:center; }
+    .philosophy__left { position:relative; }
+    .philosophy__kanji { font-family:var(--font-heading); font-size:clamp(8rem,20vw,16rem); font-weight:300; color:var(--color-red); opacity:0.15; line-height:1; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); writing-mode:vertical-rl; }
+    .philosophy__image-frame { position:relative; aspect-ratio:3/4; overflow:hidden; }
+    .philosophy__image-frame::before { content:''; position:absolute; top:-20px; right:-20px; width:100%; height:100%; border:1px solid var(--color-red); z-index:1; }
+    .philosophy__image { width:100%; height:100%; object-fit:cover; background: linear-gradient(135deg, var(--color-red), var(--color-dark-blue)); }
+    .philosophy__right { padding-left:var(--space-lg); }
+    .philosophy__label { font-family:var(--font-heading); font-size:0.75rem; font-weight:400; letter-spacing:0.3em; text-transform:uppercase; color:var(--color-red); margin-bottom:var(--space-sm); display:flex; align-items:center; gap:var(--space-sm); }
+    .philosophy__label::before { content:''; width:40px; height:1px; background-color:var(--color-red); }
+    .philosophy__heading { font-family:var(--font-heading); font-size:clamp(2.5rem,5vw,4rem); font-weight:300; line-height:1.1; letter-spacing:-0.02em; color:var(--color-white); margin-bottom:var(--space-md); }
+    .philosophy__heading em { font-style:italic; color:var(--color-red); }
+    .philosophy__text { font-family:var(--font-body); font-size:1rem; font-weight:300; line-height:1.8; color:var(--color-white-dark); margin-bottom:var(--space-md); max-width:480px; }
+    .philosophy__signature { font-family:var(--font-heading); font-size:1.25rem; color:var(--color-red); letter-spacing:0.2em; }
+    @media (max-width:968px) { .philosophy__container { grid-template-columns:1fr; gap:var(--space-lg); } .philosophy__right { padding-left:0; } }
+
+    /* ===== MENÚ (NUDO: MOMENTOS ÉPICOS) ===== */
+    .menu { position:relative; padding:var(--space-xl) 0; background-color:var(--color-blue-light); }
+    .menu__header { position:relative; z-index:20; max-width:var(--max-width); margin:0 auto; padding:0 var(--space-md); margin-bottom:var(--space-lg); display:flex; justify-content:space-between; align-items:flex-end; }
+    .menu__title-group { max-width:600px; }
+    .menu__label { font-family:var(--font-heading); font-size:0.75rem; font-weight:400; letter-spacing:0.3em; text-transform:uppercase; color:var(--color-red); margin-bottom:var(--space-sm); display:flex; align-items:center; gap:var(--space-sm); }
+    .menu__label::before { content:''; width:40px; height:1px; background-color:var(--color-red); }
+    .menu__title { font-family:var(--font-heading); font-size:clamp(2rem,4vw,3.5rem); font-weight:300; line-height:1.1; letter-spacing:-0.02em; color:var(--color-white); }
+    .menu__view-all { font-family:var(--font-heading); font-size:0.8rem; font-weight:400; letter-spacing:0.15em; text-transform:uppercase; color:var(--color-white); text-decoration:none; display:flex; align-items:center; gap:var(--space-xs); transition:color 0.3s ease; }
+    .menu__view-all:hover { color:var(--color-red); }
+    .menu__view-all svg { width:20px; height:20px; transition:transform 0.3s ease; }
+    .menu__view-all:hover svg { transform:translateX(5px); }
+    .menu__scroll { position:relative; z-index:20; display:flex; gap:var(--space-md); padding-left:max(var(--space-md), calc((100vw - var(--max-width)) / 2 + var(--space-md))); padding-right:var(--space-md); overflow:visible; will-change:transform; }
+    .menu__item { flex:0 0 auto; width:350px; scroll-snap-align:start; position:relative; overflow:visible; cursor:pointer; }
+    .menu__item::after { content:''; position:absolute; bottom:-1px; left:0; width:100%; height:80px; background:linear-gradient(to bottom, transparent 0%, rgba(30,58,111,0.4) 30%, rgba(30,58,111,0.8) 60%, var(--color-blue-light) 100%); pointer-events:none; z-index:5; }
+    .menu__item-image { position:relative; aspect-ratio:4/5; overflow:hidden; background-color:var(--color-dark-blue); border-radius:2px; }
+    .menu__item-image div { width:100%; height:100%; background: radial-gradient(circle, var(--color-red), var(--color-dark-blue)); }
+    .menu__item:hover .menu__item-image div { transform:scale(1.05); transition:transform 0.6s var(--ease-out-quart); }
+    .menu__item-overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:linear-gradient(to top, rgba(10,31,68,0.95) 0%, rgba(10,31,68,0.8) 20%, rgba(10,31,68,0.5) 40%, rgba(10,31,68,0.15) 60%, transparent 75%); z-index:3; pointer-events:none; }
+    .menu__item-content { position:absolute; bottom:0; left:0; width:100%; padding:var(--space-md); padding-bottom:calc(var(--space-md) + 40px); z-index:10; pointer-events:none; }
+    .menu__item-japanese { font-family:var(--font-heading); font-size:0.875rem; color:var(--color-red); letter-spacing:0.2em; margin-bottom:var(--space-xs); }
+    .menu__item-name { font-family:var(--font-heading); font-size:1.5rem; font-weight:400; color:var(--color-white); margin-bottom:var(--space-xs); }
+    .menu__item-desc { font-family:var(--font-body); font-size:0.875rem; font-weight:300; color:var(--color-white-dark); line-height:1.6; }
+    .menu__item-price { display:none; } /* Ocultamos precio */
+    @media (max-width:768px) { .menu__scroll { overflow-x:auto; overflow-y:hidden; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; } .menu__item { width:280px; } .menu__header { flex-direction:column; align-items:flex-start; gap:var(--space-sm); } }
+
+    /* ===== EXPERIENCIA (VIBES) ===== */
+    .experience { position:relative; padding:var(--space-xl) var(--space-md); background:transparent; }
+    .experience::before { content:''; position:absolute; inset:0; background-color:var(--color-dark-blue); z-index:0; }
+    .experience__container { position:relative; z-index:20; max-width:var(--max-width); margin:0 auto; }
+    .experience__header { text-align:center; margin-bottom:var(--space-xl); }
+    .experience__label { font-family:var(--font-heading); font-size:0.75rem; font-weight:400; letter-spacing:0.3em; text-transform:uppercase; color:var(--color-red); margin-bottom:var(--space-sm); }
+    .experience__title { font-family:var(--font-heading); font-size:clamp(2rem,4vw,3rem); font-weight:300; color:var(--color-white); letter-spacing:-0.02em; }
+    .experience__grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-lg); }
+    .experience__item { text-align:center; padding:var(--space-lg); border:1px solid transparent; transition:border-color 0.3s ease; position:relative; overflow:hidden; background-color:var(--color-dark-blue); }
+    .experience__item::before { content:''; position:absolute; inset:0; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40'%3E%3Cpath d='M0 20 Q20 0 40 20 Q60 40 80 20' fill='none' stroke='%23e11b22' stroke-width='0.5' opacity='0.6'/%3E%3C/svg%3E"); background-size:80px 40px; opacity:0; transition:opacity 0.1s ease; pointer-events:none; z-index:1; }
+    .experience__item::after { content:''; position:absolute; inset:0; background:radial-gradient(circle 120px at var(--mouse-x,50%) var(--mouse-y,50%), transparent 0%, rgba(10,31,68,0.97) 100%); opacity:0; transition:opacity 0.3s ease; pointer-events:none; z-index:2; }
+    .experience__item:hover::before { opacity:1; transition:opacity 0.3s ease 0.1s; }
+    .experience__item:hover::after { opacity:1; transition:opacity 0.1s ease; }
+    .experience__item:hover { border-color:var(--color-red); }
+    .experience__icon { font-size:3rem; margin-bottom:var(--space-md); display:block; position:relative; z-index:3; }
+    .experience__item-title { font-family:var(--font-heading); font-size:1.25rem; font-weight:400; color:var(--color-white); margin-bottom:var(--space-sm); letter-spacing:0.05em; position:relative; z-index:3; }
+    .experience__item-text { font-family:var(--font-body); font-size:0.875rem; font-weight:300; color:var(--color-white-dark); line-height:1.7; position:relative; z-index:3; }
+    @media (max-width:768px) { .experience__grid { grid-template-columns:1fr; gap:var(--space-md); } }
+
+    /* ===== CHEF (ANFITRIONES) ===== */
+    .chef { position:relative; min-height:100vh; display:flex; align-items:center; overflow:hidden; }
+    .chef__background { position:absolute; top:0; left:0; width:100%; height:120%; background:linear-gradient(135deg, var(--color-blue-light) 0%, var(--color-dark-blue) 100%); z-index:0; }
+    .chef__overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:linear-gradient(to right, rgba(10,31,68,0) 0%, rgba(10,31,68,0.8) 40%, rgba(10,31,68,1) 70%); z-index:2; }
+    .chef__content { position:relative; z-index:20; max-width:var(--max-width); margin:0 auto; padding:var(--space-xl) var(--space-md); display:flex; justify-content:flex-end; }
+    .chef__card { max-width:500px; padding:var(--space-lg); background-color:rgba(10,31,68,0.6); backdrop-filter:blur(10px); border:1px solid rgba(225,27,34,0.2); }
+    .chef__label { font-family:var(--font-heading); font-size:0.75rem; font-weight:400; letter-spacing:0.3em; text-transform:uppercase; color:var(--color-red); margin-bottom:var(--space-md); }
+    .chef__quote { font-family:var(--font-heading); font-size:clamp(1.5rem,3vw,2rem); font-weight:300; font-style:italic; line-height:1.5; color:var(--color-white); margin-bottom:var(--space-md); }
+    .chef__quote::before { content:'"'; font-size:4rem; line-height:0; vertical-align:-0.4em; color:var(--color-red); margin-right:var(--space-xs); }
+    .chef__name { font-family:var(--font-heading); font-size:1rem; font-weight:400; color:var(--color-white); margin-bottom:var(--space-xs); }
+    .chef__title { font-family:var(--font-body); font-size:0.875rem; font-weight:300; color:var(--color-white-dark); }
+    .chef__kanji { font-family:var(--font-heading); font-size:8rem; font-weight:300; color:var(--color-red); opacity:0.1; position:absolute; bottom:var(--space-md); right:var(--space-md); line-height:1; }
+    @media (max-width:768px) { .chef { min-height:auto; padding:var(--space-lg) 0; } .chef__content { justify-content:center; padding:var(--space-md); } .chef__card { max-width:100%; padding:var(--space-md); } .chef__kanji { font-size:5rem; right:var(--space-sm); bottom:var(--space-sm); } }
+
+    /* ===== RESERVA (RSVP) ===== */
+    .reservation { position:relative; padding:var(--space-2xl) var(--space-md); background:transparent; text-align:center; }
+    .reservation::before { content:''; position:absolute; inset:0; background-color:var(--color-blue-light); z-index:0; }
+    .reservation__container { position:relative; z-index:20; max-width:600px; margin:0 auto; }
+    .reservation__kanji { font-size:4rem; line-height:1; margin-bottom:var(--space-sm); }
+    .reservation__label { font-family:var(--font-heading); font-size:0.75rem; font-weight:400; letter-spacing:0.3em; text-transform:uppercase; color:var(--color-red); margin-bottom:var(--space-sm); }
+    .reservation__title { font-family:var(--font-heading); font-size:clamp(2rem,4vw,3rem); font-weight:300; color:var(--color-white); margin-bottom:var(--space-sm); letter-spacing:-0.02em; }
+    .reservation__subtitle { font-family:var(--font-body); font-size:1rem; font-weight:300; color:var(--color-white-dark); margin-bottom:var(--space-lg); line-height:1.7; }
+    .reservation__form { display:flex; flex-direction:column; gap:var(--space-sm); }
+    .reservation__row { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-sm); }
+    .reservation__input { width:100%; padding:var(--space-sm); font-family:var(--font-body); font-size:0.875rem; font-weight:300; color:var(--color-white); background-color:transparent; border:1px solid rgba(225,27,34,0.3); outline:none; transition:border-color 0.3s ease; }
+    .reservation__input::placeholder { color:var(--color-white-dark); }
+    .reservation__input:focus { border-color:var(--color-red); }
+    .reservation__button { margin-top:var(--space-sm); padding:var(--space-sm) var(--space-lg); font-family:var(--font-heading); font-size:0.875rem; font-weight:400; letter-spacing:0.2em; text-transform:uppercase; color:var(--color-white); background-color:var(--color-red); border:none; cursor:pointer; transition:all 0.3s var(--ease-out-quart); position:relative; overflow:hidden; }
+    .reservation__button:hover { background-color:var(--color-red-light); transform:translateY(-2px); }
+    .reservation__button::after { content:''; position:absolute; top:50%; left:50%; width:0; height:0; background-color:rgba(255,255,255,0.2); border-radius:50%; transform:translate(-50%,-50%); transition:width 0.6s ease, height 0.6s ease; }
+    .reservation__button:active::after { width:300px; height:300px; }
+    @media (max-width:576px) { .reservation__row { grid-template-columns:1fr; } .reservation__kanji { font-size:4rem; } .reservation__container { padding:0 var(--space-sm); } }
+
+    /* ===== FOOTER ===== */
+    .footer { position:relative; padding:var(--space-lg) var(--space-md) var(--space-md); background-color:var(--color-dark-blue); border-top:1px solid rgba(225,27,34,0.2); overflow:hidden; z-index:10; }
+    .footer::before { content:''; position:absolute; inset:0; background-color:var(--color-dark-blue); z-index:0; }
+    .footer__kanji { font-family:var(--font-heading); font-size:12rem; font-weight:300; color:var(--color-red); opacity:0.03; position:absolute; top:0; right:2%; line-height:1; pointer-events:none; }
+    .footer__container { position:relative; z-index:20; max-width:var(--max-width); margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:var(--space-lg); }
+    .footer__brand { max-width:300px; }
+    .footer__logo { font-size:2.5rem; color:var(--color-red); margin-bottom:var(--space-xs); }
+    .footer__logo-en { font-family:var(--font-heading); font-size:0.75rem; font-weight:300; letter-spacing:0.3em; text-transform:uppercase; color:var(--color-white); margin-bottom:var(--space-md); }
+    .footer__tagline { font-family:var(--font-body); font-size:0.875rem; font-weight:300; color:var(--color-white-dark); line-height:1.7; }
+    .footer__col-title { font-family:var(--font-heading); font-size:0.75rem; font-weight:400; letter-spacing:0.2em; text-transform:uppercase; color:var(--color-red); margin-bottom:var(--space-md); }
+    .footer__links { list-style:none; }
+    .footer__link { font-family:var(--font-body); font-size:0.875rem; font-weight:300; color:var(--color-white-dark); text-decoration:none; display:block; margin-bottom:var(--space-xs); transition:color 0.3s ease; }
+    .footer__link:hover { color:var(--color-red); }
+    .footer__contact-item { font-family:var(--font-body); font-size:0.875rem; font-weight:300; color:var(--color-white-dark); margin-bottom:var(--space-xs); line-height:1.6; }
+    .footer__social { display:flex; gap:var(--space-sm); margin-top:var(--space-md); }
+    .footer__social-link { width:40px; height:40px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(225,27,34,0.3); color:var(--color-white); text-decoration:none; transition:all 0.3s ease; }
+    .footer__social-link:hover { border-color:var(--color-red); color:var(--color-red); }
+    .footer__bottom { position:relative; z-index:2; max-width:var(--max-width); margin:var(--space-lg) auto 0; padding-top:var(--space-md); border-top:1px solid rgba(225,27,34,0.1); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:var(--space-sm); }
+    .footer__copyright { font-family:var(--font-body); font-size:0.75rem; font-weight:300; color:var(--color-white-dark); }
+    .footer__legal { display:flex; gap:var(--space-md); }
+    .footer__legal-link { font-family:var(--font-body); font-size:0.75rem; font-weight:300; color:var(--color-white-dark); text-decoration:none; transition:color 0.3s ease; }
+    .footer__legal-link:hover { color:var(--color-red); }
+    @media (max-width:968px) { .footer__container { grid-template-columns:1fr 1fr; } .footer__brand { grid-column:span 2; } .footer__kanji { font-size:8rem; } }
+    @media (max-width:576px) { .footer__container { grid-template-columns:1fr; } .footer__brand { grid-column:span 1; } .footer__bottom { flex-direction:column; text-align:center; } .footer__kanji { font-size:5rem; } }
+
+    /* ===== UTILIDADES REVEAL ===== */
+    .reveal { opacity:0; transform:translateY(40px); }
+    .reveal-left { opacity:0; transform:translateX(-40px); }
+    .reveal-right { opacity:0; transform:translateX(40px); }
+    .reveal-scale { opacity:0; transform:scale(0.95); }
+
+    /* ===== GRAIN (textura) ===== */
+    .grain { position:fixed; top:0; left:0; width:100%; height:100%; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); opacity:0.03; pointer-events:none; z-index:9997; }
+
+    /* Ocultamos kanji de fondo (no necesario) */
+    .background-kanji { display:none; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+    <div class="loader__logo">🥤</div>
+    <div class="loader__text">Preparando la fiesta</div>
+    <div class="loader__progress"><div class="loader__progress-bar" id="loaderProgress"></div></div>
+    <div class="loader__count" id="loaderCount">0%</div>
+  </div>
+
+  <!-- GRANO -->
+  <div class="grain"></div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="#" class="nav__logo">🥤 <span class="nav__logo-en">PEPSI NIGHT</span></a>
+    <ul class="nav__links">
+      <li><a href="#philosophy" class="nav__link">Inicio</a></li>
+      <li><a href="#menu" class="nav__link">El Nudo</a></li>
+      <li><a href="#experience" class="nav__link">Vibes</a></li>
+      <li><a href="#chef" class="nav__link">Anfitriones</a></li>
+    </ul>
+    <a href="#reservation" class="nav__cta">¡Confirmar asistencia!</a>
+    <button class="nav__menu-btn" aria-label="Menú"><span></span><span></span><span></span></button>
+  </nav>
+
+  <!-- HERO con animación (366 frames) -->
+  <section class="hero" id="hero">
+    <div class="hero__canvas-container">
+      <canvas class="hero__canvas" id="heroCanvas"></canvas>
+      <div class="hero__overlay"></div>
+      <div class="hero__fade"></div>
+      <div class="hero__content">
+        <h1 class="hero__japanese" id="heroJapanese">🥤</h1>
+        <p class="hero__title" id="heroTitle">PEPSI NIGHT</p>
+        <p class="hero__tagline" id="heroTagline">"La fiesta que nunca olvidarás"</p>
+      </div>
+      <div class="hero__scroll" id="heroScroll">
+        <span class="hero__scroll-text">Desliza para vivirla</span>
+        <span class="hero__scroll-line"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="main-content">
+    <!-- FILOSOFÍA (INICIO DE LA HISTORIA) -->
+    <section class="philosophy" id="philosophy">
+      <div class="philosophy__container">
+        <div class="philosophy__left reveal-left">
+          <span class="philosophy__kanji">🎉</span>
+          <div class="philosophy__image-frame">
+            <div class="philosophy__image"></div>
+          </div>
+        </div>
+        <div class="philosophy__right">
+          <span class="philosophy__label reveal">Érase una vez...</span>
+          <h2 class="philosophy__heading reveal">
+            Javi, Laura, Carlos y María<br>decidieron <em>montar la fiesta</em>
+          </h2>
+          <p class="philosophy__text reveal">
+            Todo empezó con un mensaje de WhatsApp a las 2 de la madrugada: "¿Y si hacemos la fiesta universitaria más épica de la historia?" Lo que siguió fue una locura de planificación, risas y mucho, mucho Pepsi.
+          </p>
+          <p class="philosophy__text reveal">
+            El lugar: un loft en el centro. La misión: que nadie se lo pierda. Y así, sin querer, comenzó la noche que cambiaría sus vidas (y las de 300 asistentes).
+          </p>
+          <span class="philosophy__signature reveal">— El comienzo</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- MENÚ (NUDO: MOMENTOS ÉPICOS) -->
+    <section class="menu" id="menu">
+      <div class="menu__header">
+        <div class="menu__title-group">
+          <span class="menu__label reveal">El nudo de la noche</span>
+          <h2 class="menu__title reveal">Momentos que merecen ser contados</h2>
+        </div>
+        <a href="#" class="menu__view-all reveal">
+          Ver todos
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+      <div class="menu__scroll">
+        <!-- Momento 1 -->
+        <article class="menu__item reveal-scale">
+          <div class="menu__item-image">
+            <div class="menu__item-overlay"></div>
+            <div></div>
+          </div>
+          <div class="menu__item-content">
+            <span class="menu__item-japanese">🔥</span>
+            <h3 class="menu__item-name">El derrame de Javi</h3>
+            <p class="menu__item-desc">Javi intentó hacer un truco con una botella de Pepsi y terminó empapando a Laura. Ella, lejos de enfadarse, se lo tomó a risa y empezó una guerra de espuma.</p>
+          </div>
+        </article>
+        <!-- Momento 2 -->
+        <article class="menu__item reveal-scale">
+          <div class="menu__item-image">
+            <div class="menu__item-overlay"></div>
+            <div></div>
+          </div>
+          <div class="menu__item-content">
+            <span class="menu__item-japanese">💃</span>
+            <h3 class="menu__item-name">El baile de Laura</h3>
+            <p class="menu__item-desc">Laura se subió a la mesa y empezó a bailar al ritmo de los 2000. En cinco minutos, todo el mundo la seguía. Nació un meme.</p>
+          </div>
+        </article>
+        <!-- Momento 3 -->
+        <article class="menu__item reveal-scale">
+          <div class="menu__item-image">
+            <div class="menu__item-overlay"></div>
+            <div></div>
+          </div>
+          <div class="menu__item-content">
+            <span class="menu__item-japanese">🎤</span>
+            <h3 class="menu__item-name">Karaoke improvisado</h3>
+            <p class="menu__item-desc">Carlos agarró el micro y soltó un "Living la vida loca" que ni Ricky Martin. El público coreó hasta quedarse sin voz.</p>
+          </div>
+        </article>
+        <!-- Momento 4 -->
+        <article class="menu__item reveal-scale">
+          <div class="menu__item-image">
+            <div class="menu__item-overlay"></div>
+            <div></div>
+          </div>
+          <div class="menu__item-content">
+            <span class="menu__item-japanese">🍕</span>
+            <h3 class="menu__item-name">La pizza de las 3 AM</h3>
+            <p class="menu__item-desc">Llegaron 20 pizzas y desaparecieron en 10 minutos. María dijo: "La próxima vez pedimos 40".</p>
+          </div>
+        </article>
+        <!-- Momento 5 -->
+        <article class="menu__item reveal-scale">
+          <div class="menu__item-image">
+            <div class="menu__item-overlay"></div>
+            <div></div>
+          </div>
+          <div class="menu__item-content">
+            <span class="menu__item-japanese">📸</span>
+            <h3 class="menu__item-name">Foto grupal</h3>
+            <p class="menu__item-desc">300 personas intentando salir en una selfie. El resultado: la foto más épica y borrosa de la historia, pero todos la tienen de fondo de pantalla.</p>
+          </div>
+        </article>
+        <!-- Momento 6 -->
+        <article class="menu__item reveal-scale">
+          <div class="menu__item-image">
+            <div class="menu__item-overlay"></div>
+            <div></div>
+          </div>
+          <div class="menu__item-content">
+            <span class="menu__item-japanese">🌅</span>
+            <h3 class="menu__item-name">El amanecer</h3>
+            <p class="menu__item-desc">Cuando el sol salió, todos estaban en la terraza, agotados pero felices. Javi levantó una lata de Pepsi y brindó: "¡Por nosotros!"</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- EXPERIENCIA (VIBES) -->
+    <section class="experience" id="experience">
+      <div class="experience__container">
+        <div class="experience__header">
+          <span class="experience__label reveal">El sello de la noche</span>
+          <h2 class="experience__title reveal">Lo que hizo única la fiesta</h2>
+        </div>
+        <div class="experience__grid">
+          <div class="experience__item reveal">
+            <span class="experience__icon">🎶</span>
+            <h3 class="experience__item-title">Música non-stop</h3>
+            <p class="experience__item-text">De los 80 a los 2000, pasando por reggaetón y electrónica. Nadie se quedó sin bailar.</p>
+          </div>
+          <div class="experience__item reveal">
+            <span class="experience__icon">🥤</span>
+            <h3 class="experience__item-title">Pepsi infinita</h3>
+            <p class="experience__item-text">Barriles de Pepsi, hielo y limón. La bebida oficial de la noche, y la que mantuvo a todos despiertos.</p>
+          </div>
+          <div class="experience__item reveal">
+            <span class="experience__icon">🤝</span>
+            <h3 class="experience__item-title">Gente nueva</h3>
+            <p class="experience__item-text">Se conocieron, rieron, y algunos hasta encontraron el amor (o al menos un buen amigo).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHEF (ANFITRIONES) -->
+    <section class="chef" id="chef">
+      <div class="chef__background"></div>
+      <div class="chef__overlay"></div>
+      <div class="chef__content">
+        <div class="chef__card reveal-right">
+          <span class="chef__label">Los anfitriones</span>
+          <blockquote class="chef__quote">
+            No planeamos que fuera tan épico, pero cuando tienes buena música, buen rollo y Pepsi, todo fluye.
+          </blockquote>
+          <p class="chef__name">— Javi, Laura, Carlos y María</p>
+          <p class="chef__title">Los que empezaron todo</p>
+        </div>
+        <span class="chef__kanji">🎓</span>
+      </div>
+    </section>
+
+    <!-- RESERVA (RSVP) -->
+    <section class="reservation" id="reservation">
+      <div class="reservation__container">
+        <div class="reservation__kanji reveal">🥤</div>
+        <span class="reservation__label reveal">¿Te lo vas a perder?</span>
+        <h2 class="reservation__title reveal">Únete a la leyenda</h2>
+        <p class="reservation__subtitle reveal">
+          Plaza del Ayuntamiento 12, 46002 Valencia<br>
+          📞 629 554 870 · Rubik Sota<br>
+          La próxima fiesta será aún más grande. Apúntate y te avisamos.
+        </p>
+        <form class="reservation__form reveal" onsubmit="return false;">
+          <div class="reservation__row">
+            <input type="text" class="reservation__input" placeholder="Nombre" required>
+            <input type="email" class="reservation__input" placeholder="Email" required>
+          </div>
+          <div class="reservation__row">
+            <input type="text" class="reservation__input" placeholder="Universidad">
+            <select class="reservation__input" required>
+              <option value="" disabled selected>¿Vendrás?</option>
+              <option value="si">¡Sí, fijo!</option>
+              <option value="probable">Probablemente</option>
+              <option value="no">No puedo :(</option>
+            </select>
+          </div>
+          <button type="submit" class="reservation__button">¡Cuenta conmigo!</button>
+        </form>
+      </div>
+    </section>
+  </div> <!-- /.main-content -->
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span class="footer__kanji">🥤</span>
+    <div class="footer__container">
+      <div class="footer__brand">
+        <div class="footer__logo">🥤</div>
+        <div class="footer__logo-en">PEPSI NIGHT</div>
+        <p class="footer__tagline">"La fiesta universitaria más esperada. Porque las noches que merecen la pena se viven con Pepsi."</p>
+      </div>
+      <div class="footer__col">
+        <h4 class="footer__col-title">Navega</h4>
+        <ul class="footer__links">
+          <li><a href="#philosophy" class="footer__link">Inicio</a></li>
+          <li><a href="#menu" class="footer__link">El Nudo</a></li>
+          <li><a href="#experience" class="footer__link">Vibes</a></li>
+          <li><a href="#chef" class="footer__link">Anfitriones</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4 class="footer__col-title">Contacto</h4>
+        <p class="footer__contact-item">Plaza del Ayuntamiento 12<br>46002 Valencia</p>
+        <p class="footer__contact-item">629 554 870</p>
+        <p class="footer__contact-item">fiesta@pepsinight.es</p>
+      </div>
+      <div class="footer__col">
+        <h4 class="footer__col-title">Redes</h4>
+        <div class="footer__social">
+          <a href="#" class="footer__social-link" aria-label="Instagram">IG</a>
+          <a href="#" class="footer__social-link" aria-label="TikTok">TT</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p class="footer__copyright">© 2025 PEPSI NIGHT. Todos los derechos reservados.</p>
+      <div class="footer__legal">
+        <a href="#" class="footer__legal-link">Idea by Rubik Sota · 629 554 870</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script>
+    // ========== CONFIGURACIÓN CORREGIDA (frames en GitHub) ==========
+    const CONFIG = {
+      BASE_URL: 'https://raw.githubusercontent.com/JUANMAES83/WEBPEPSI/main/public/pepsi_animations',
+      FRAME_COUNT: 366,
+      getFramePath: function(index) {
+        const frameNum = String(index + 1).padStart(3, '0'); // 001 ... 366
+        return `${this.BASE_URL}/frame_${frameNum}.jpg`;
+      }
+    };
+
+    const images = [];
+    let imagesLoaded = 0;
+
+    function preloadImages() {
+      return new Promise((resolve) => {
+        const loader = document.getElementById('loader');
+        const progressBar = document.getElementById('loaderProgress');
+        const countText = document.getElementById('loaderCount');
+
+        for (let i = 0; i < CONFIG.FRAME_COUNT; i++) {
+          const img = new Image();
+          img.onload = () => {
+            imagesLoaded++;
+            const progress = (imagesLoaded / CONFIG.FRAME_COUNT) * 100;
+            progressBar.style.width = `${progress}%`;
+            countText.textContent = `${Math.round(progress)}%`;
+
+            if (imagesLoaded === CONFIG.FRAME_COUNT) {
+              setTimeout(() => {
+                loader.classList.add('hidden');
+                initAnimations();
+                resolve();
+              }, 500);
+            }
+          };
+          img.onerror = () => {
+            console.warn(`Error cargando frame ${i}: ${CONFIG.getFramePath(i)}`);
+            imagesLoaded++;
+            const progress = (imagesLoaded / CONFIG.FRAME_COUNT) * 100;
+            progressBar.style.width = `${progress}%`;
+            countText.textContent = `${Math.round(progress)}%`;
+            if (imagesLoaded === CONFIG.FRAME_COUNT) {
+              setTimeout(() => {
+                loader.classList.add('hidden');
+                initAnimations();
+                resolve();
+              }, 500);
+            }
+          };
+          img.src = CONFIG.getFramePath(i);
+          images.push(img);
+        }
+      });
+    }
+
+    function initCanvas() {
+      const canvas = document.getElementById('heroCanvas');
+      const ctx = canvas.getContext('2d');
+
+      function resizeCanvas() {
+        const container = canvas.parentElement;
+        const containerWidth = container.offsetWidth;
+        const containerHeight = container.offsetHeight;
+        const img = images[0];
+        if (!img) return;
+
+        const imgWidth = img.naturalWidth || 800;
+        const imgHeight = img.naturalHeight || 600;
+        const imgAspect = imgWidth / imgHeight;
+        let drawWidth, drawHeight;
+        const containerAspect = containerWidth / containerHeight;
+
+        if (containerAspect > imgAspect) {
+          drawWidth = containerWidth;
+          drawHeight = containerWidth / imgAspect;
+        } else {
+          drawHeight = containerHeight;
+          drawWidth = containerHeight * imgAspect;
+        }
+
+        canvas.width = drawWidth;
+        canvas.height = drawHeight;
+        canvas.style.width = `${drawWidth}px`;
+        canvas.style.height = `${drawHeight}px`;
+
+        if (images[0] && images[0].complete) {
+          renderFrame(0);
+        }
+      }
+
+      function renderFrame(frameIndex) {
+        const index = Math.min(Math.max(frameIndex, 0), CONFIG.FRAME_COUNT - 1);
+        const img = images[index];
+        if (img && img.complete && img.naturalWidth > 0) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      renderFrame(0);
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      ScrollTrigger.create({
+        trigger: '#hero',
+        start: 'top top',
+        end: '+=300%',
+        pin: true,
+        pinSpacing: true,
+        scrub: 0.3,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const frameIndex = Math.floor(self.progress * (CONFIG.FRAME_COUNT - 1));
+          renderFrame(frameIndex);
+        }
+      });
+    }
+
+    function initNavigation() {
+      const nav = document.getElementById('nav');
+      let lastScroll = 0;
+      window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+        if (currentScroll > window.innerHeight) {
+          if (currentScroll > lastScroll) nav.classList.add('hidden');
+          else nav.classList.remove('hidden');
+        } else {
+          nav.classList.remove('hidden');
+        }
+        lastScroll = currentScroll;
+      });
+    }
+
+    function initHeroAnimation() {
+      const tl = gsap.timeline({ delay: 0.5 });
+      tl.to('#heroJapanese', { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' })
+        .to('#heroTitle', { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }, '-=0.8')
+        .to('#heroTagline', { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }, '-=0.6')
+        .to('#heroScroll', { opacity: 1, duration: 1, ease: 'power3.out' }, '-=0.4');
+    }
+
+    function initExperienceHover() {
+      const items = document.querySelectorAll('.experience__item');
+      items.forEach(item => {
+        item.addEventListener('mousemove', (e) => {
+          const rect = item.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          item.style.setProperty('--mouse-x', `${x}%`);
+          item.style.setProperty('--mouse-y', `${y}%`);
+        });
+      });
+    }
+
+    function initRevealAnimations() {
+      ScrollTrigger.refresh();
+      gsap.utils.toArray('.reveal').forEach(elem => {
+        gsap.fromTo(elem, { opacity:0, y:40 }, { opacity:1, y:0, duration:1, ease:'power3.out', scrollTrigger:{ trigger:elem, start:'top 90%', toggleActions:'play none none none' } });
+      });
+      gsap.utils.toArray('.reveal-left').forEach(elem => {
+        gsap.fromTo(elem, { opacity:0, x:-40 }, { opacity:1, x:0, duration:1, ease:'power3.out', scrollTrigger:{ trigger:elem, start:'top 90%', toggleActions:'play none none none' } });
+      });
+      gsap.utils.toArray('.reveal-right').forEach(elem => {
+        gsap.fromTo(elem, { opacity:0, x:40 }, { opacity:1, x:0, duration:1, ease:'power3.out', scrollTrigger:{ trigger:elem, start:'top 90%', toggleActions:'play none none none' } });
+      });
+      gsap.utils.toArray('.reveal-scale').forEach((elem,i) => {
+        gsap.fromTo(elem, { opacity:0, scale:0.95 }, { opacity:1, scale:1, duration:0.8, delay:i*0.1, ease:'power3.out', scrollTrigger:{ trigger:elem, start:'top 95%', toggleActions:'play none none none' } });
+      });
+    }
+
+    function initMenuHorizontalScroll() {
+      const menuSection = document.querySelector('.menu');
+      const menuScroll = document.querySelector('.menu__scroll');
+      const menuItems = document.querySelectorAll('.menu__item');
+      if (!menuSection || !menuScroll || menuItems.length === 0) return;
+      if (window.innerWidth <= 768) return;
+
+      const itemWidth = menuItems[0].offsetWidth;
+      const gap = parseFloat(getComputedStyle(menuScroll).gap) || 32;
+      const totalWidth = (itemWidth * menuItems.length) + (gap * (menuItems.length - 1));
+      const viewportWidth = window.innerWidth;
+      const paddingLeft = parseFloat(getComputedStyle(menuScroll).paddingLeft) || 32;
+      const scrollDistance = totalWidth - viewportWidth + paddingLeft + gap;
+
+      gsap.to(menuScroll, {
+        x: -scrollDistance,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: menuSection,
+          start: 'top top',
+          end: () => `+=${scrollDistance}`,
+          pin: true,
+          scrub: 0.5,
+          anticipatePin: 1,
+          invalidateOnRefresh: true
+        }
+      });
+    }
+
+    function initAnimations() {
+      initCanvas();
+      initNavigation();
+      initHeroAnimation();
+      initExperienceHover();
+      setTimeout(() => {
+        initRevealAnimations();
+        initMenuHorizontalScroll();
+        setTimeout(() => ScrollTrigger.refresh(), 200);
+      }, 100);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      preloadImages();
+    });
+  </script>
+</body>
+</html>
